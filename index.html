@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MintVault Cards - Rare cards. Unreal prices.</title>
+<meta name="description" content="MintVault Cards: rare holo trading cards, graded and sealed, from $0.99.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Inter:wght@400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p:0; --q:0;
+  --ink:#14213d; --mint:#17c3a0; --mint-d:#0e9a7e; --sun:#ffd23f; --coral:#ff6b6b; --mut:#5b6b82;
+  --f-shop:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-disp:'Fredoka','Inter',system-ui,sans-serif;
+  --f-type:'Special Elite','Courier New',monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:auto}
+body{margin:0;font-family:var(--f-shop);color:var(--ink);background:#f5faf8;overflow-x:hidden;-webkit-font-smoothing:antialiased;line-height:1.5}
+img,svg{max-width:100%}
+a{color:inherit}
+.wrap{width:min(1180px,100% - 32px);margin-inline:auto}
+button{font:inherit;cursor:pointer}
+
+/* ---------- global scroll-driven overlays ---------- */
+#fog,#tint,#vig,#grain{position:fixed;inset:0;pointer-events:none}
+#tint{z-index:21;background:#0d2a1c;opacity:clamp(0,calc((var(--p) - .12) * .8),.45)}
+#fog{z-index:20;overflow:hidden;opacity:clamp(0,min(calc((var(--p) - .22) * 1.6),calc((1 - var(--p)) * 3)),.7)}
+#fog i{position:absolute;left:-50%;width:200%;height:55%;background:
+  radial-gradient(ellipse at 25% 50%,rgba(176,196,186,.38),transparent 60%),
+  radial-gradient(ellipse at 70% 45%,rgba(176,196,186,.3),transparent 62%);
+  animation:drift 46s ease-in-out infinite alternate}
+#fog i:nth-child(1){top:5%}
+#fog i:nth-child(2){top:48%;animation-duration:62s;animation-direction:alternate-reverse}
+#vig{z-index:22;background:radial-gradient(ellipse at 50% 50%,transparent 38%,rgba(0,0,0,.92) 125%);opacity:clamp(0,calc(var(--p) * 1.25),1)}
+#grain{z-index:23;opacity:calc(var(--p) * .16);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+body.zone-5 #fog{opacity:.12}
+body.zone-5 #tint{opacity:0}
+@keyframes drift{from{transform:translateX(-9%)}to{transform:translateX(9%)}}
+
+#night{position:fixed;z-index:60;top:72px;right:16px;font-family:var(--f-type);font-size:14px;letter-spacing:.14em;color:#c5d8cd;text-shadow:0 0 8px #000;opacity:0;transition:opacity 1.5s;pointer-events:none}
+body.zone-3 #night,body.zone-4 #night,body.zone-5 #night{opacity:.85}
+body.zone-5 #night{color:#ff5a4a}
+
+#eyes{position:fixed;z-index:45;right:0;bottom:0;width:240px;height:200px;pointer-events:none;opacity:0;transition:opacity 2.5s}
+body.zone-3 #eyes{opacity:.5}
+body.zone-4 #eyes{opacity:.9}
+#eyes .dark{position:absolute;inset:0;background:radial-gradient(ellipse at 100% 100%,rgba(0,0,0,.95),rgba(0,0,0,.6) 45%,transparent 72%)}
+#eyes .pair{position:absolute;right:62px;bottom:46px;display:flex;gap:18px}
+#eyes .pair i{display:block;width:13px;height:6px;border-radius:50%;background:#ff3030;box-shadow:0 0 10px 3px rgba(255,40,40,.65)}
+
+#snd{position:fixed;z-index:70;left:12px;bottom:12px;border:1px solid rgba(120,140,130,.5);background:rgba(10,18,14,.72);color:#cfe0d6;border-radius:999px;padding:6px 12px;font-size:12px;font-family:var(--f-shop)}
+#snd:hover{background:rgba(10,18,14,.9)}
+#toast{position:fixed;z-index:80;left:50%;bottom:22px;transform:translate(-50%,20px);max-width:calc(100% - 32px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+body.zone-3 #toast,body.zone-4 #toast{font-family:var(--f-type);background:#0b1410;color:#d3e6da;border:1px solid #2c4137}
+
+/* ---------- header ---------- */
+.annc{background:var(--ink);color:#fff;text-align:center;font-size:13px;padding:8px 16px;letter-spacing:.01em}
+.site-head{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(20,33,61,.08);transition:background .8s,color .8s,opacity .8s,border-color .8s}
+.bar{display:flex;align-items:center;gap:20px;height:64px}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;font-family:var(--f-disp);font-size:22px;font-weight:600;letter-spacing:-.01em}
+.logo b{color:var(--mint-d);margin-left:4px;font-weight:600}
+.site-head nav{display:flex;gap:22px;margin-left:auto;font-weight:500;font-size:15px}
+.site-head nav a{text-decoration:none;padding:6px 2px;border-bottom:2px solid transparent;transition:border-color .2s}
+.site-head nav a:hover{border-color:var(--mint)}
+.cart{background:var(--ink);color:#fff;border:0;border-radius:999px;padding:9px 16px;font-weight:600;font-size:14px;transition:transform .2s,background .2s}
+.cart:hover{transform:translateY(-1px);background:var(--mint-d)}
+.cart span{display:inline-block;min-width:20px;margin-left:4px;background:var(--sun);color:var(--ink);border-radius:999px;padding:0 6px;text-align:center}
+@media(max-width:720px){.site-head nav{display:none}.cart{margin-left:auto}}
+body.zone-3 .site-head{background:rgba(24,36,30,.88);color:#cfe0d6;border-color:#2c4137}
+body.zone-3 .site-head nav{font-family:var(--f-type)}
+body.zone-4 .site-head{background:rgba(4,8,6,.6);color:#8aa396;border-color:transparent}
+body.zone-4 .site-head nav{font-family:var(--f-type);letter-spacing:.1em}
+body.zone-4 .logo{opacity:.5}
+body.zone-5 .site-head{opacity:0;pointer-events:none}
+
+/* ---------- zones ---------- */
+.shopfx{filter:saturate(max(.12,calc(1 - var(--p) * 1.9)))}
+.zone{position:relative;overflow-x:clip}
+.z1{background:linear-gradient(#e6f8f3,#f6fbff 360px,#f5faf8)}
+.z2{background:linear-gradient(#f5faf8,#e4ece8 60%,#cdd5d0);padding:56px 0 90px}
+.z3{background:linear-gradient(#cdd5d0 0,#b3beb7 240px,#2a382f 620px,#17231d 62%,#0b1410 100%);color:#dcebe2;min-height:210vh;padding:70px 0 340px}
+.z4{background:linear-gradient(#0b1410,#0b1410 70%,#050907);color:#b4c9bd;min-height:240vh;padding:60px 0 360px}
+.z5{background:#030605;height:360vh}
+
+.pill{display:inline-block;background:var(--coral);color:#fff;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:center;padding:46px 0 26px}
+@media(max-width:860px){.hero{grid-template-columns:1fr;padding-top:28px}}
+h1{font-family:var(--f-disp);font-size:clamp(40px,7.2vw,78px);line-height:1;margin:.25em 0 .2em;font-weight:600;letter-spacing:-.015em}
+h1 em{font-style:normal;color:var(--mint-d);background:linear-gradient(transparent 64%,rgba(255,210,63,.6) 0)}
+.hero-copy p{font-size:18px;color:var(--mut);max-width:520px;margin:0 0 22px}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;background:var(--mint);color:#fff;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:14px;box-shadow:0 8px 20px rgba(23,195,160,.35);transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(23,195,160,.45)}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 2px rgba(20,33,61,.14)}
+.count{margin-top:22px;display:inline-flex;gap:10px;align-items:center;background:#fff;border-radius:12px;padding:10px 16px;box-shadow:0 4px 14px rgba(20,33,61,.08);font-weight:500}
+.count b{font-variant-numeric:tabular-nums;font-family:var(--f-disp);font-size:22px;color:var(--coral)}
+.fan{position:relative;height:clamp(300px,44vw,450px)}
+.fan .tcard{position:absolute;width:min(230px,46%);top:0;transition:transform .4s}
+.fan .c1{left:3%;top:46px;transform:rotate(-11deg)}
+.fan .c2{left:50%;transform:translateX(-50%);z-index:2}
+.fan .c3{right:3%;top:46px;transform:rotate(11deg)}
+.fan:hover .c1{transform:rotate(-16deg) translateX(-10px)}
+.fan:hover .c3{transform:rotate(16deg) translateX(10px)}
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:6px 0 38px}
+@media(max-width:760px){.trust{grid-template-columns:1fr 1fr}}
+.trust div{background:#fff;border-radius:14px;padding:14px;display:flex;gap:10px;align-items:center;font-size:14px;font-weight:500;box-shadow:0 3px 12px rgba(20,33,61,.06)}
+.trust svg{flex:none}
+.sec-h{margin:12px 0 22px}
+.sec-h h2{font-family:var(--f-disp);font-size:clamp(28px,4vw,40px);margin:0;font-weight:600}
+.sec-h p{margin:4px 0 0;color:var(--mut)}
+.z1 .wrap:last-child{padding-bottom:70px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,235px),1fr));gap:22px}
+.prod{background:#fff;border-radius:18px;padding:14px;box-shadow:0 6px 24px rgba(20,33,61,.08);display:flex;flex-direction:column;gap:12px;transition:transform .25s,box-shadow .25s}
+.prod:hover{transform:translateY(-6px);box-shadow:0 16px 36px rgba(20,33,61,.16)}
+.prod .tcard{max-width:270px;margin-inline:auto}
+.pi{display:flex;flex-direction:column;gap:6px;flex:1}
+.badge{align-self:flex-start;background:#e6f8f3;color:var(--mint-d);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
+.pi h3{margin:0;font-size:16px;line-height:1.25}
+.rate{font-size:13px;color:var(--mut)}
+.st{color:#f5a623;letter-spacing:1px}
+.desc{margin:0;font-size:13px;color:var(--mut);min-height:2.6em}
+.price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.price b{font-family:var(--f-disp);font-size:26px;font-weight:600}
+.price s{color:#97a3b6;font-size:14px}
+.price em{font-style:normal;font-size:12px;color:var(--coral);font-weight:700}
+.stock{font-size:12px;font-weight:600;color:var(--mint-d)}
+.stock::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mint);margin-right:6px}
+.add{margin-top:auto;background:var(--ink);color:#fff;border:0;border-radius:12px;padding:12px;font-weight:700;transition:background .2s,transform .2s}
+.add:hover{background:var(--mint-d);transform:translateY(-1px)}
+
+/* trading card (original frame) */
+.tcard{position:relative;width:100%;aspect-ratio:5/7;border-radius:14px;padding:7px;background:linear-gradient(135deg,#ffd86b,#ff9ad5 35%,#7ad7ff 65%,#ffd86b);box-shadow:0 3px 10px rgba(0,0,0,.22);font-size:11.5px;color:#2a2438;overflow:hidden}
+.tin{height:100%;background:#fffaf0;border-radius:9px;padding:7px 8px;display:flex;flex-direction:column;gap:5px}
+.th{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--f-disp);font-size:1.28em;min-height:1.3em}
+.th b{font-weight:600}
+.th span{font-size:.7em;color:#b3322c}
+.art{border-radius:6px;overflow:hidden;border:2px solid #d9b94f;aspect-ratio:4/3;background:#cde;position:relative}
+.art svg{display:block;width:100%;height:100%}
+.tt{font-weight:700;font-size:.8em;letter-spacing:.06em;text-transform:uppercase;color:#7a6a3a}
+.tin p{margin:0;font-size:.92em;line-height:1.3;flex:1;overflow:hidden}
+.tf{display:flex;justify-content:space-between;font-size:.78em;color:#8a7f66;border-top:1px solid #eadfbe;padding-top:4px}
+.tcard::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.55) 45%,transparent 60%);transform:translateX(-100%);transition:transform .8s;pointer-events:none}
+.prod:hover .tcard::after,.fan:hover .tcard::after{transform:translateX(100%)}
+
+/* zone 2: slightly off */
+.z2 .prod{background:#fcfdfc}
+.reviews{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:18px}
+.rev{background:#fff;border-radius:16px;padding:18px;box-shadow:0 4px 16px rgba(20,33,61,.07)}
+.rev header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.av{width:36px;height:36px;border-radius:50%;background:var(--mint);color:#fff;display:grid;place-items:center;font-weight:700}
+.rev b{display:block;font-size:14px}
+.rev small{color:var(--mut);font-size:12px}
+.rev p{margin:6px 0 0;font-size:14px}
+.strip{margin-top:34px;text-align:center;color:var(--mut);font-size:14px}
+
+/* zone 3: uncanny */
+.hush{text-align:center;color:#1d2a24;padding:0 0 70px}
+.hush h2{font-family:var(--f-type);font-weight:400;font-size:clamp(26px,5vw,52px);margin:0 0 8px;line-height:1.15}
+.hush p{font-family:var(--f-type);margin:0;font-size:clamp(15px,2.2vw,19px)}
+.infostrip{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 34px;font-family:var(--f-type);color:#a9c1b3;margin:0 0 40px;font-size:clamp(14px,2vw,17px)}
+.z3 .prod{background:rgba(255,255,255,.05);box-shadow:0 0 0 1px rgba(160,190,175,.14);color:#d2e3d9}
+.z3 .prod:hover{transform:translateY(-3px);box-shadow:0 0 0 1px rgba(160,190,175,.3)}
+.z3 .tcard{filter:sepia(.35) saturate(.65) brightness(.88)}
+.z3 .badge{background:rgba(160,190,175,.14);color:#a9c1b3}
+.z3 .rate,.z3 .desc{color:#8da699}
+.z3 .price s{color:#6f8478}
+.z3 .stock{color:#e08a7a;font-family:var(--f-type)}
+.z3 .stock::before{background:#c04a3a;opacity:.8}
+.z3 .add{background:#25362d;color:#cfe0d6;font-family:var(--f-type)}
+.z3 .add:hover{background:#3a2a2a}
+.z3 .pi h3{font-family:var(--f-type);font-weight:400}
+.lines{margin:60px 0 0;display:grid;gap:70px}
+.line{font-family:var(--f-type);font-size:clamp(20px,3.4vw,36px);color:#c3d6ca;text-shadow:0 0 14px #000;line-height:1.3}
+.line small{display:block;font-size:.5em;color:#7f968a;margin-top:6px}
+
+/* generic reveals */
+.rv{opacity:0;transform:translateY(16px);transition:opacity 1.2s,transform 1.2s}
+.rv.in{opacity:1;transform:none}
+.fd{opacity:0;transition:opacity 1.8s}
+.fd.in{opacity:1}
+@keyframes jit{0%,86%,100%{transform:translate(0)}88%{transform:translate(1px,-1px) skewX(.6deg)}90%{transform:translate(-2px,1px)}93%{transform:translate(1px,0) skewX(-.5deg)}96%{transform:translate(0)}}
+body.zone-3 .jit,body.zone-4 .jit,body.zone-5 .jit{animation:jit 5.5s infinite}
+
+/* trees */
+.trees{position:absolute;left:0;right:0;pointer-events:none;color:#0b1410}
+.trees svg{display:block;width:100%;height:100%;fill:currentColor}
+.z3>.trees{bottom:0;height:300px;color:#0b1410}
+.z4>.trees{bottom:0;height:340px;color:#030605;z-index:2}
+.z4>.trees.back{height:420px;color:#09130e;z-index:0;opacity:.8}
+
+/* zone 4: wrong */
+.fogband{position:absolute;left:-50%;width:200%;height:42%;pointer-events:none;background:
+  radial-gradient(ellipse at 30% 50%,rgba(150,175,162,.16),transparent 60%),
+  radial-gradient(ellipse at 75% 50%,rgba(150,175,162,.12),transparent 62%);animation:drift 50s ease-in-out infinite alternate;z-index:1}
+.fogband.f1{top:6%}.fogband.f2{top:38%;animation-duration:70s;animation-direction:alternate-reverse}.fogband.f3{top:70%;animation-duration:58s}
+.z4 .content{position:relative;z-index:3}
+.frag{font-family:var(--f-type);margin:70px 0;line-height:1.2;text-shadow:0 0 14px #000,1px 0 rgba(255,40,40,.35),-1px 0 rgba(60,255,255,.2)}
+.frag.big{font-size:clamp(30px,6.5vw,76px);color:#d4e6db}
+.frag.mid{font-size:clamp(22px,4vw,44px);color:#a9c1b3}
+.frag.small{font-size:clamp(14px,2vw,18px);color:#6f8a7c;letter-spacing:.08em}
+.frag.red{color:#c43a2a}
+.frag.l{text-align:left}.frag.r{text-align:right}.frag.c{text-align:center}
+.wreck{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;padding:50px 0 70px}
+.z4 .prod{width:min(250px,72vw);margin:-26px -14px;background:#101c16;color:#9bb3a7;box-shadow:none;position:relative}
+.z4 .prod:hover{transform:none;box-shadow:none}
+.wreck .prod:nth-child(6n+1){transform:rotate(-8deg) translateY(10px);clip-path:polygon(0 2%,6% 0,14% 3%,23% 0,35% 2%,48% 0,60% 3%,73% 1%,86% 3%,100% 0,100% 96%,92% 100%,80% 97%,66% 100%,52% 96%,38% 100%,24% 97%,10% 100%,0 97%)}
+.wreck .prod:nth-child(6n+2){transform:rotate(5deg) translateY(54px);clip-path:polygon(0 0,12% 3%,27% 0,41% 2%,55% 0,70% 3%,84% 1%,100% 3%,98% 40%,100% 58%,97% 100%,80% 98%,62% 100%,44% 97%,26% 100%,9% 98%,0 100%,2% 60%,0 30%)}
+.wreck .prod:nth-child(6n+3){transform:rotate(-3deg) translateY(-22px);clip-path:polygon(2% 0,20% 2%,40% 0,58% 3%,80% 0,100% 2%,100% 100%,84% 97%,66% 100%,45% 96%,25% 100%,8% 97%,0 100%,0 0)}
+.wreck .prod:nth-child(6n+4){transform:rotate(9deg) translateY(30px);clip-path:polygon(0 4%,16% 0,30% 3%,50% 0,66% 2%,82% 0,100% 4%,100% 92%,88% 100%,70% 96%,52% 100%,34% 97%,16% 100%,0 95%)}
+.wreck .prod:nth-child(6n+5){transform:rotate(-6deg) translateY(74px);clip-path:polygon(0 0,100% 3%,97% 25%,100% 50%,96% 75%,100% 100%,60% 97%,30% 100%,0 96%,3% 70%,0 40%)}
+.wreck .prod:nth-child(6n+6){transform:rotate(3deg) translateY(8px);clip-path:polygon(0 3%,18% 0,40% 3%,62% 0,85% 2%,100% 0,100% 97%,78% 100%,55% 96%,30% 100%,10% 97%,0 100%)}
+.z4 .tcard{background:linear-gradient(135deg,#6b5a2a,#4a2a40 40%,#2a4a55 70%,#6b5a2a);filter:saturate(.35) brightness(.7) contrast(1.1)}
+.z4 .tin{background:#c9c2a8}
+.z4 .art::after{content:"";position:absolute;left:79%;top:62%;width:5px;height:3px;border-radius:50%;background:#ff3030;box-shadow:0 0 6px 2px rgba(255,40,40,.7),9px 0 0 0 #ff3030,9px 0 6px 2px rgba(255,40,40,.7)}
+.z4 .badge{background:#1c2c24;color:#8aa396}
+.z4 .rate,.z4 .desc{color:#6f8a7c}
+.z4 .rate .st{color:#7a6a3a}
+.z4 .price b{font-family:var(--f-type);font-weight:400;color:#d4e6db}
+.z4 .stock{color:#e0705f;font-family:var(--f-type)}
+.z4 .stock::before{background:#c43a2a}
+.z4 .pi h3,.z4 .desc{font-family:var(--f-type);font-weight:400}
+.z4 .add{background:#2a1a1a;color:#e0705f;font-family:var(--f-type)}
+.peekrow{display:flex;justify-content:space-around;align-items:flex-end;margin:40px 0 20px;gap:10px}
+.peek{width:min(260px,44vw);height:auto;background:linear-gradient(#0e1a14,#16241d);border-radius:4px;opacity:.9}
+.peek:nth-child(2){width:min(180px,34vw);transform:translateY(30px)}
+
+.campstick{position:sticky;top:0;height:0;z-index:4;pointer-events:none}
+.camp{position:absolute;left:max(16px,4vw);top:calc(100vh - 170px);width:110px;transform:scale(calc(1 - var(--zp,0) * .8));transform-origin:50% 100%;opacity:calc(1 - var(--zp,0) * .55)}
+.camp::before{content:"";position:absolute;left:50%;top:50%;width:560px;height:560px;margin:-280px 0 0 -280px;background:radial-gradient(circle,rgba(255,150,60,.34),rgba(255,110,40,.1) 40%,transparent 66%);opacity:clamp(0,calc(1.1 - var(--zp,0) * 1.3),1);pointer-events:none}
+.camp svg{position:relative;display:block;width:100%;height:auto}
+.camp .flames{transform-origin:60px 100px;animation:flick 2.4s ease-in-out infinite alternate;opacity:calc(1 - var(--zp,0) * .6)}
+@keyframes flick{from{transform:scale(1,1)}to{transform:scale(.93,1.07)}}
+
+/* zone 5: the Deer */
+.stage{position:sticky;top:0;height:100vh;overflow:hidden;background:
+  radial-gradient(circle at 72% 14%,rgba(190,210,200,.1),transparent 24%),
+  linear-gradient(#08110e,#0c1713 55%,#030605)}
+.stage .trees{bottom:0}
+.stage .t-far{height:58%;color:#0d1a15;opacity:.95}
+.stage .t-mid{height:66%;color:#07100c}
+.stage .t-near{height:48%;color:#010202;opacity:clamp(0,calc(1 - var(--q) * 1.5),1)}
+.mist{position:absolute;left:-50%;width:200%;height:55%;pointer-events:none;background:
+  radial-gradient(ellipse at 30% 50%,rgba(170,192,182,.2),transparent 60%),
+  radial-gradient(ellipse at 72% 45%,rgba(170,192,182,.15),transparent 62%);animation:drift 44s ease-in-out infinite alternate}
+.mist.m1{top:30%}
+.mist.m2{top:45%;animation-duration:60s;animation-direction:alternate-reverse}
+.mist.front{top:25%;height:70%;opacity:clamp(0,calc(1 - var(--q) * 2.4),1);background:
+  radial-gradient(ellipse at 50% 55%,rgba(150,172,162,.5),transparent 62%);animation:none}
+.deerwrap{position:absolute;inset:0;pointer-events:none}
+.deer{position:absolute;left:50%;top:0;height:100vh;width:50vh;margin-left:-25vh;transform-origin:50% 24%;
+  transform:translateY(36vh) scale(calc(.18 + var(--q) * var(--q) * 8.5));opacity:clamp(0,calc((var(--q) - .04) * 6),1)}
+.deer .glow{animation:pulse 3.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.62}50%{opacity:1}}
+.say{position:absolute;left:0;right:0;text-align:center;font-family:var(--f-type);color:#b9ccc2;padding:0 16px;font-size:clamp(18px,3vw,30px);text-shadow:0 0 12px #000;pointer-events:none;
+  opacity:clamp(0,min(calc((var(--q) - var(--a)) * 10),calc((var(--b) - var(--q)) * 10)),1)}
+.bl{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 28%,rgba(24,0,0,.9) 100%);opacity:clamp(0,calc((var(--q) - .55) * 3),1)}
+.fin{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;opacity:clamp(0,calc((var(--q) - .84) * 14),1)}
+.fin b{font-family:var(--f-type);font-weight:400;font-size:clamp(46px,13vw,170px);line-height:1;color:#e8efe9;letter-spacing:.06em;text-shadow:0 0 30px #000,0 0 6px #000}
+.fin span{font-family:var(--f-type);font-size:clamp(22px,5vw,58px);color:#ff4636;letter-spacing:.14em;text-shadow:0 0 20px #000,0 0 6px #000;margin-top:10px}
+.back{position:absolute;left:0;right:0;bottom:28px;text-align:center;font-family:var(--f-type);color:#cfd8d2;font-size:16px;letter-spacing:.1em;text-decoration:underline;text-underline-offset:5px;opacity:clamp(0,calc((var(--q) - .93) * 20),1);pointer-events:none;z-index:5;text-shadow:0 0 10px #000}
+body.end .back{pointer-events:auto}
+.back:hover{color:#fff}
+
+noscript{display:block;padding:40px;text-align:center}
+
+@media(max-width:600px){
+  #night{top:68px;font-size:12px}
+  #eyes{width:170px;height:150px}
+  #eyes .pair{right:30px;bottom:30px}
+  .frag{margin:48px 0}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+  .rv,.fd{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body class="zone-1">
+
+<!-- shared SVG symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="pine" viewBox="0 0 100 300" preserveAspectRatio="none"><path d="M50 0 72 70H60L80 130H66L90 200H54V300H46V200H10L34 130H20L40 70H28Z"/></symbol>
+    <symbol id="dead" viewBox="0 0 100 300" preserveAspectRatio="none"><path d="M50 300V100M50 200 22 150 14 110M50 160 80 120 88 80M50 120 38 80 40 40M22 150 8 148M80 120 96 122" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<div id="tint" aria-hidden="true"></div>
+<div id="fog" aria-hidden="true"><i></i><i></i></div>
+<div id="vig" aria-hidden="true"></div>
+<div id="grain" aria-hidden="true"></div>
+<div id="night" aria-hidden="true">NIGHT 01</div>
+<div id="eyes" aria-hidden="true"><div class="dark"></div><div class="pair" id="pair"><i></i><i></i></div></div>
+<button id="snd" type="button" aria-pressed="false">sound: off</button>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<div class="annc" id="annc">Free worldwide shipping on every order &middot; Graded &amp; authenticated &middot; New drops daily</div>
+<header class="site-head" id="top">
+  <div class="wrap bar">
+    <a class="logo" href="#top" aria-label="MintVault Cards home">
+      <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect x="3" y="3" width="26" height="26" rx="7" fill="#17c3a0"/><path d="M9 21V11l7 7 7-7v10" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>MintVault<b>Cards</b></span>
+    </a>
+    <nav aria-label="Main">
+      <a href="#shop" data-alt="Stay">Shop</a>
+      <a href="#shop" data-alt="Look">New in</a>
+      <a href="#shop" data-alt="Behind">Graded</a>
+      <a href="#shop" data-alt="Don't leave">Deals</a>
+      <a href="#shop" data-alt="You">About</a>
+    </nav>
+    <button class="cart" id="cart" type="button">Cart <span id="cartN">0</span></button>
+  </div>
+</header>
+
+<div class="shopfx">
+
+<!-- ================= ZONE 1: normal shop ================= -->
+<section class="zone z1" id="z1" data-z="1">
+  <div class="wrap hero">
+    <div class="hero-copy">
+      <span class="pill">Summer vault sale &middot; up to 95% off</span>
+      <h1>Rare cards.<br><em>Unreal prices.</em></h1>
+      <p>Authentic 1st edition holos, graded 10 and sealed, from just $0.99. Every card checked by a real person, shipped free, and covered by our 30-day promise.</p>
+      <div class="cta"><a class="btn" href="#shop">Shop the vault</a><a class="btn ghost" href="#shop">New arrivals</a></div>
+      <div class="count" id="count"><span id="cdl">Sale ends in</span> <b id="cd">02:14:59</b></div>
+    </div>
+    <div class="fan" id="fan" aria-hidden="true"></div>
+  </div>
+  <div class="wrap trust">
+    <div><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0e9a7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7zM7 19a2 2 0 100-.01M17 19a2 2 0 100-.01"/></svg>Free shipping worldwide</div>
+    <div><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0e9a7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Authenticity guaranteed</div>
+    <div><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0e9a7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0114-5l2-2v6h-6l2.5-2.5A5 5 0 007 12M20 12a8 8 0 01-14 5l-2 2v-6h6l-2.5 2.5A5 5 0 0017 12" /></svg>30-day easy returns</div>
+    <div><svg width="26" height="26" viewBox="0 0 24 24" fill="#f5a623"><path d="M12 2l3 6.5 7 .8-5.200 4.800 1.500 7L12 17.500 5.700 21.100l1.500-7L2 9.300l7-.8z"/></svg>4.9 / 5 from 12,480 reviews</div>
+  </div>
+  <div class="wrap" id="shop">
+    <div class="sec-h"><h2>Bestsellers</h2><p>Hand-picked, graded 10, ready to ship today.</p></div>
+    <div class="grid" id="grid1"></div>
+  </div>
+</section>
+
+<!-- ================= ZONE 2: slightly off ================= -->
+<section class="zone z2" id="z2" data-z="2">
+  <div class="wrap">
+    <div class="sec-h"><h2>Customer favourites</h2><p>Prices update every night.</p></div>
+    <div class="grid" id="grid2"></div>
+
+    <div class="sec-h" style="margin-top:64px"><h2>What collectors say</h2><p>Over 99,000 happy collectors.</p></div>
+    <div class="reviews">
+      <article class="rev"><header><div class="av">D</div><div><b>Dana K.</b><small>Verified buyer</small></div></header><div class="st">★★★★★</div><p>Arrived quickly and exactly as described. Would buy again.</p></article>
+      <article class="rev"><header><div class="av" style="background:#6c8cff">M</div><div><b>Marcus T.</b><small>Verified buyer</small></div></header><div class="st">★★★★★</div><p>Arrived quickly and exactly as described. Would buy again.</p></article>
+      <article class="rev"><header><div class="av" style="background:#ff9a5c">P</div><div><b>Priya S.</b><small>Verified buyer</small></div></header><div class="st">★★★★★</div><p>Arrived quickly and exactly as described. Would buy again. Would stay again.</p></article>
+      <article class="rev"><header><div class="av" style="background:#7a8a82">.</div><div><b>...</b><small>Verified buyer</small></div></header><div class="st">★★★★★</div><p>arrived quickly and exactly as described. would buy again. would buy again. would stay.</p></article>
+      <article class="rev"><header><div class="av" style="background:#8a7fb8">T</div><div><b>Tom R.</b><small>Verified buyer</small></div></header><div class="st">★★★★★</div><p>Arrived. Exactly as described. Would not leave again.</p></article>
+    </div>
+    <p class="strip">Order tracking: we always know where you are.</p>
+  </div>
+</section>
+
+<!-- ================= ZONE 3: uncanny ================= -->
+<section class="zone z3" id="z3" data-z="3">
+  <div class="wrap">
+    <div class="hush jit">
+      <h2>You've been scrolling a long time.</h2>
+      <p>Stay a while. The shop never closes. Neither do we.</p>
+    </div>
+    <div class="infostrip rv"><span>Shipping takes 99 nights.</span><span>Estimated delivery: Night 99.</span><span>Returns: you may not.</span></div>
+    <div class="grid" id="grid3"></div>
+    <div class="lines">
+      <p class="line rv jit">Customers who bought this also bought: you.<small>(recommended for you)</small></p>
+      <p class="line rv">Why did you stop at the Hollowfawn?<small>Look at the trees behind it.</small></p>
+      <p class="line rv jit">Is the shop still loading?<small>It is not the shop that is loading.</small></p>
+    </div>
+  </div>
+  <div class="trees" data-seed="11" data-n="26" data-min="150" data-max="280"></div>
+</section>
+
+</div><!-- /shopfx -->
+
+<!-- ================= ZONE 4: wrong ================= -->
+<section class="zone z4" id="z4" data-z="4">
+  <div class="campstick"><div class="camp" id="camp">
+    <svg viewBox="0 0 120 120" aria-label="A campfire, burning lower">
+      <defs><linearGradient id="flg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff5a1f"/><stop offset=".6" stop-color="#ffa63a"/><stop offset="1" stop-color="#ffe27a"/></linearGradient></defs>
+      <g class="flames">
+        <path d="M60 100C30 96 34 62 52 46 52 60 60 62 60 50 64 36 58 24 66 10 80 32 94 58 84 82 80 94 72 100 60 100Z" fill="url(#flg)"/>
+        <path d="M60 100C46 98 48 80 58 70 60 78 66 78 66 70 74 80 76 98 60 100Z" fill="#ffe9a8" opacity=".9"/>
+      </g>
+      <ellipse cx="60" cy="108" rx="40" ry="5" fill="#000" opacity=".5"/>
+      <rect x="22" y="98" width="76" height="9" rx="4" fill="#4a2f1b" transform="rotate(-8 60 102)"/>
+      <rect x="22" y="98" width="76" height="9" rx="4" fill="#5d3b22" transform="rotate(8 60 102)"/>
+    </svg>
+  </div></div>
+  <div class="trees back" data-seed="5" data-n="30" data-min="180" data-max="300"></div>
+  <div class="fogband f1"></div><div class="fogband f2"></div><div class="fogband f3"></div>
+
+  <div class="wrap content">
+    <p class="frag big l jit rv">don't turn around</p>
+    <div class="wreck" id="grid4"></div>
+    <p class="frag mid r jit rv">it doesn't blink</p>
+    <div class="peekrow rv">
+      <svg class="peek" viewBox="0 0 300 260" role="img" aria-label="Antlers between two tree trunks">
+        <rect x="38" y="0" width="40" height="260" fill="#030605"/><rect x="222" y="0" width="34" height="260" fill="#030605"/>
+        <ellipse cx="150" cy="140" rx="15" ry="23" fill="#020403"/>
+        <g id="antlerS" fill="none" stroke="#8a836f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M143 122C132 92 112 82 102 50M124 88C114 84 106 86 98 78M114 68C108 58 106 52 108 38"/></g>
+        <use href="#antlerS" transform="translate(300 0) scale(-1 1)"/>
+      </svg>
+      <svg class="peek" viewBox="0 0 300 260" role="img" aria-label="Antlers between two tree trunks">
+        <rect x="70" y="0" width="30" height="260" fill="#030605"/><rect x="190" y="0" width="44" height="260" fill="#030605"/>
+        <ellipse cx="150" cy="170" rx="15" ry="23" fill="#020403"/>
+        <g id="antlerS2" fill="none" stroke="#8a836f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M143 152C132 122 112 112 102 80M124 118C114 114 106 116 98 108M114 98C108 88 106 82 108 68"/></g>
+        <use href="#antlerS2" transform="translate(300 0) scale(-1 1)"/>
+      </svg>
+    </div>
+    <p class="frag small l rv">you counted the trees. there are more now.</p>
+    <p class="frag big c jit rv red">the campfire is going out</p>
+    <p class="frag mid l rv">the shop was never real.<br>the forest was always here.</p>
+    <p class="frag small r rv">it learned how to stand like a deer</p>
+    <p class="frag mid c jit rv">do not run</p>
+  </div>
+  <div class="trees" data-seed="23" data-n="22" data-min="190" data-max="300"></div>
+</section>
+
+<!-- ================= ZONE 5: The Deer ================= -->
+<section class="zone z5" id="z5" data-z="5">
+  <div class="stage">
+    <div class="trees t-far" data-seed="41" data-n="34" data-min="140" data-max="260"></div>
+    <div class="mist m1"></div>
+    <div class="trees t-mid" data-seed="7" data-n="18" data-min="190" data-max="300"></div>
+    <div class="mist m2"></div>
+    <div class="deerwrap">
+      <svg class="deer" viewBox="0 0 400 800" role="img" aria-label="The Deer: a tall, gaunt antlered creature with a bare skull face and glowing red eyes">
+        <defs>
+          <radialGradient id="halo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#7a1010" stop-opacity=".5"/><stop offset="1" stop-color="#7a1010" stop-opacity="0"/></radialGradient>
+          <linearGradient id="bone" x1="0" x2="1"><stop offset="0" stop-color="#6d6757"/><stop offset=".5" stop-color="#d9d2bd"/><stop offset="1" stop-color="#625d4f"/></linearGradient>
+          <linearGradient id="hide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#19201c"/><stop offset="1" stop-color="#050706"/></linearGradient>
+          <filter id="eg" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="3.5"/></filter>
+          <g id="antler" fill="none" stroke="#a79f88" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M178 152C162 118 136 100 118 62 112 48 112 34 118 16" stroke-width="7"/>
+            <path d="M150 112C132 108 114 112 98 96M136 92C126 78 116 72 100 70M126 72C116 64 106 60 94 44M118 46C104 42 92 44 78 32M168 132C156 126 148 130 138 128M118 30C122 20 132 14 140 6" stroke-width="4"/>
+            <path d="M178 152C162 118 136 100 118 62" stroke="#5f594a" stroke-width="2" transform="translate(2 2)"/>
+          </g>
+        </defs>
+        <circle cx="200" cy="200" r="190" fill="url(#halo)"/>
+        <!-- back legs -->
+        <g stroke="#0c100e" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="8">
+          <path d="M152 470C132 560 142 650 130 768"/><path d="M248 470C268 560 258 650 270 768"/>
+        </g>
+        <!-- front legs -->
+        <g stroke="#060807" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="9">
+          <path d="M170 380C160 470 158 560 150 650L146 762"/><path d="M230 380C240 470 242 560 250 650L254 762"/>
+        </g>
+        <g fill="#1d1c17"><path d="M146 760l-7 18h14z"/><path d="M254 760l-7 18h14z"/><path d="M130 766l-7 16h14z"/><path d="M270 766l-7 16h14z"/></g>
+        <!-- torso and neck -->
+        <path d="M184 214C176 270 166 320 158 352 142 420 148 500 170 560H230C252 500 258 420 242 352 234 320 224 270 216 214Z" fill="url(#hide)"/>
+        <g stroke="#2b3530" stroke-width="2" fill="none" stroke-linecap="round">
+          <path d="M160 392C190 406 210 406 240 392"/><path d="M158 420C190 436 210 436 242 420"/><path d="M158 448C190 464 210 464 242 448"/><path d="M162 476C190 490 210 490 238 476"/><path d="M168 504C192 516 208 516 232 504"/><path d="M200 360V540"/>
+        </g>
+        <path d="M156 352 140 400 152 384 148 444 162 392ZM244 352 262 404 248 388 254 450 238 396Z" fill="#060807"/>
+        <!-- ears -->
+        <path d="M172 160 128 138 168 182Z" fill="#111612"/><path d="M228 160 272 138 232 182Z" fill="#111612"/>
+        <path d="M168 164 142 150 166 176Z" fill="#3a1f1f"/><path d="M232 164 258 150 234 176Z" fill="#3a1f1f"/>
+        <!-- antlers -->
+        <use href="#antler"/>
+        <use href="#antler" transform="translate(400 0) scale(-1 1)"/>
+        <!-- skull face -->
+        <path d="M168 160C165 126 235 126 232 160 236 185 222 200 214 214L212 262C210 274 190 274 188 262L186 214C178 200 164 185 168 160Z" fill="url(#bone)"/>
+        <path d="M168 160C172 150 190 146 200 150 210 146 228 150 232 160" fill="none" stroke="#3b362b" stroke-width="2"/>
+        <path d="M200 134 198 150 205 162" fill="none" stroke="#4a4436" stroke-width="1.4"/>
+        <ellipse cx="184" cy="170" rx="10" ry="12" fill="#030303"/><ellipse cx="216" cy="170" rx="10" ry="12" fill="#030303"/>
+        <g class="glow">
+          <circle cx="184" cy="170" r="13" fill="#ff1f1f" filter="url(#eg)" opacity=".85"/><circle cx="216" cy="170" r="13" fill="#ff1f1f" filter="url(#eg)" opacity=".85"/>
+          <circle cx="184" cy="170" r="5" fill="#ff4a3a"/><circle cx="216" cy="170" r="5" fill="#ff4a3a"/>
+          <circle cx="184" cy="170" r="2" fill="#fff1e0"/><circle cx="216" cy="170" r="2" fill="#fff1e0"/>
+        </g>
+        <ellipse cx="194" cy="254" rx="2.600" ry="5" fill="#0a0907"/><ellipse cx="206" cy="254" rx="2.600" ry="5" fill="#0a0907"/>
+        <path d="M190 266H210" stroke="#1a1713" stroke-width="2"/>
+        <path d="M190 262v8M194 262v8M198 262v8M202 262v8M206 262v8M210 262v8" stroke="#2a251d" stroke-width="1.200"/>
+      </svg>
+    </div>
+    <div class="trees t-near" data-seed="3" data-n="14" data-min="220" data-max="300"></div>
+    <div class="mist front"></div>
+    <div class="bl"></div>
+    <p class="say" style="--a:.02;--b:.22;top:14%">the shop is closed.</p>
+    <p class="say" style="--a:.2;--b:.42;top:14%">it has been standing there the whole time.</p>
+    <p class="say" style="--a:.4;--b:.62;top:14%">it is taller than the trees.</p>
+    <p class="say" style="--a:.58;--b:.82;top:14%">do not look away.</p>
+    <div class="fin"><b>NIGHT 99</b><span>IT FOUND YOU</span></div>
+    <a class="back" id="back" href="#top">return to shop &uarr;</a>
+  </div>
+</section>
+
+<script>
+(function(){
+  'use strict';
+  var root=document.documentElement, body=document.body;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function clamp(v,a,b){return v<a?a:(v>b?b:v)}
+
+  /* ---------- art: original creatures ---------- */
+  var uid=0;
+  var PAL={ember:['#ffe2b8','#ffa35c'],moss:['#dcf6c8','#86d58f'],zap:['#dbe6ff','#93a9ff'],tide:['#cdf4ff','#62c9e9'],frost:['#eaf2ff','#aec6ff'],pebble:['#f2e8d8','#cdb48e'],gloom:['#eedcff','#bb90dc'],sun:['#fff4b8','#ffcb63'],fawn:['#f6e5ca','#d1ab77']};
+  function eye(x,y,r){r=r||3.4;return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#22171a"/><circle cx="'+(x+r*.35)+'" cy="'+(y-r*.35)+'" r="'+(r*.35)+'" fill="#fff"/>';}
+  function smile(x,y){return '<path d="M'+(x-4)+' '+y+'q4 4 8 0" stroke="#4a2a22" fill="none" stroke-width="1.6" stroke-linecap="round"/>';}
+  var CR={
+    ember:function(){return '<path d="M128 112c40 4 44-36 24-52 4 22-8 34-26 36z" fill="#ff6a2b"/><path d="M152 60c0-16 12-22 8-34 18 14 14 34-8 34z" fill="#ffd23f"/><ellipse cx="100" cy="104" rx="30" ry="26" fill="#f08a3c"/><ellipse cx="100" cy="112" rx="17" ry="14" fill="#ffe3bd"/><path d="M80 58 76 32 96 50zM120 58l4-26-20 18z" fill="#f08a3c"/><circle cx="100" cy="74" r="23" fill="#f59a4a"/>'+eye(91,74)+eye(109,74)+'<ellipse cx="100" cy="82" rx="3" ry="2" fill="#5b2a1c"/>'+smile(100,87)+'<ellipse cx="86" cy="128" rx="9" ry="5" fill="#d9742a"/><ellipse cx="114" cy="128" rx="9" ry="5" fill="#d9742a"/>';},
+    moss:function(){return '<ellipse cx="100" cy="104" rx="32" ry="27" fill="#6cc27a"/><ellipse cx="100" cy="112" rx="20" ry="15" fill="#d2f3c8"/><circle cx="100" cy="78" r="24" fill="#7fd48a"/><path d="M100 56C96 38 80 32 66 36c4 14 18 24 34 20z" fill="#3e9c55"/><path d="M100 56c4-18 20-24 34-20-4 14-18 24-34 20z" fill="#56b86c"/><path d="M100 56v-9" stroke="#2d7a44" stroke-width="3" stroke-linecap="round"/>'+eye(90,80,4)+eye(110,80,4)+smile(100,90)+'<circle cx="80" cy="88" r="4" fill="#ff9aa8" opacity=".6"/><circle cx="120" cy="88" r="4" fill="#ff9aa8" opacity=".6"/><ellipse cx="84" cy="130" rx="9" ry="5" fill="#4aa862"/><ellipse cx="116" cy="130" rx="9" ry="5" fill="#4aa862"/>';},
+    zap:function(){return '<path d="M128 118 146 98 138 96 156 68 152 90 162 90 146 118z" fill="#ffd23f"/><ellipse cx="100" cy="106" rx="28" ry="25" fill="#7d8cff"/><ellipse cx="100" cy="113" rx="16" ry="13" fill="#dde3ff"/><path d="M82 62 70 32 92 52zM118 62l12-30-22 20z" fill="#6a78f0"/><path d="M70 32l3 8 6-6zM130 32l-3 8-6-6z" fill="#2b2f66"/><circle cx="100" cy="78" r="22" fill="#8d9bff"/>'+eye(91,78)+eye(109,78)+'<circle cx="80" cy="88" r="4.500" fill="#ff7aa0"/><circle cx="120" cy="88" r="4.500" fill="#ff7aa0"/>'+smile(100,90)+'<ellipse cx="86" cy="130" rx="8" ry="5" fill="#5f6de0"/><ellipse cx="114" cy="130" rx="8" ry="5" fill="#5f6de0"/>';},
+    tide:function(){return '<path d="M134 92 160 70 158 114z" fill="#2a9cc4"/><path d="M86 64Q100 38 116 64z" fill="#2a9cc4"/><ellipse cx="98" cy="92" rx="38" ry="32" fill="#4cc3e6"/><ellipse cx="94" cy="104" rx="26" ry="18" fill="#c9f2ff"/><path d="M64 96 44 84 48 108z" fill="#2a9cc4"/>'+eye(84,84,5)+eye(106,84,5)+'<ellipse cx="95" cy="98" rx="4" ry="3" fill="#2b6a88"/><circle cx="64" cy="58" r="6" fill="none" stroke="#fff" stroke-width="2"/><circle cx="54" cy="44" r="4" fill="none" stroke="#fff" stroke-width="2"/>';},
+    frost:function(){return '<ellipse cx="66" cy="78" rx="32" ry="20" transform="rotate(-25 66 78)" fill="#bcd4ff"/><ellipse cx="134" cy="78" rx="32" ry="20" transform="rotate(25 134 78)" fill="#bcd4ff"/><ellipse cx="74" cy="108" rx="20" ry="13" transform="rotate(20 74 108)" fill="#9fbdf5"/><ellipse cx="126" cy="108" rx="20" ry="13" transform="rotate(-20 126 108)" fill="#9fbdf5"/><circle cx="58" cy="74" r="4" fill="#fff"/><circle cx="142" cy="74" r="4" fill="#fff"/><ellipse cx="100" cy="94" rx="14" ry="28" fill="#eef4ff"/><circle cx="100" cy="62" r="14" fill="#f5f8ff"/><path d="M94 50 84 34M106 50l10-16" stroke="#7f9fe0" stroke-width="2.500" fill="none" stroke-linecap="round"/>'+eye(95,62,3)+eye(105,62,3)+smile(100,69);},
+    pebble:function(){return '<path d="M62 120 56 88 72 60 104 50 134 64 144 96 138 120z" fill="#a8977a"/><path d="M72 60 104 50 134 64 120 70 90 66z" fill="#c9b898"/><path d="M110 56 106 76M96 112 104 100" stroke="#7d6e56" stroke-width="2" fill="none"/><ellipse cx="54" cy="104" rx="9" ry="12" fill="#8f7f64"/><ellipse cx="146" cy="104" rx="9" ry="12" fill="#8f7f64"/>'+eye(88,88,4.5)+eye(114,88,4.5)+'<path d="M92 102h18" stroke="#4a3f30" stroke-width="2.500" stroke-linecap="round"/><path d="M116 52c4-8 12-8 14 0z" fill="#6cc27a"/>';},
+    gloom:function(){return '<rect x="85" y="84" width="30" height="42" rx="12" fill="#efe6d8"/><path d="M48 92C46 46 154 46 152 92z" fill="#9a63c7"/><path d="M48 92h104" stroke="#6a3f90" stroke-width="4"/><circle cx="72" cy="72" r="7" fill="#e8d4ff"/><circle cx="108" cy="62" r="9" fill="#e8d4ff"/><circle cx="132" cy="80" r="6" fill="#e8d4ff"/>'+eye(94,104,3.6)+eye(106,104,3.6)+smile(100,114)+'<ellipse cx="92" cy="128" rx="9" ry="4.500" fill="#d9ccb8"/><ellipse cx="108" cy="128" rx="9" ry="4.500" fill="#d9ccb8"/>';},
+    sun:function(){var s='';for(var i=0;i<10;i++){s+='<ellipse cx="100" cy="48" rx="9" ry="19" fill="'+(i%2?'#ffd23f':'#ffc233')+'" transform="rotate('+(i*36)+' 100 80)"/>';}return '<path d="M100 104V134" stroke="#3e9c55" stroke-width="5" stroke-linecap="round"/><path d="M100 124c-16-2-26-10-28-20 14 0 24 6 28 20z" fill="#56b86c"/>'+s+'<circle cx="100" cy="80" r="21" fill="#ff9d2e"/>'+eye(93,78,3.4)+eye(107,78,3.4)+smile(100,89)+'<circle cx="86" cy="88" r="3.500" fill="#ff6a5c" opacity=".6"/><circle cx="114" cy="88" r="3.500" fill="#ff6a5c" opacity=".6"/>';},
+    fawn:function(){return '<g stroke="#8a6a3a" stroke-width="5" stroke-linecap="round"><path d="M78 112 74 138M92 114 90 138M114 114 116 138M128 112 132 138"/></g><ellipse cx="102" cy="104" rx="32" ry="20" fill="#c99a5b"/><circle cx="90" cy="96" r="3" fill="#fff" opacity=".8"/><circle cx="104" cy="92" r="3" fill="#fff" opacity=".8"/><circle cx="116" cy="98" r="3" fill="#fff" opacity=".8"/><path d="M120 100 130 70" stroke="#c99a5b" stroke-width="14" stroke-linecap="round"/><ellipse cx="132" cy="64" rx="15" ry="13" fill="#d9ae70"/><ellipse cx="144" cy="70" rx="9" ry="7" fill="#ecc88e"/><path d="M122 56 114 44 130 52zM138 54l8-12-2 14z" fill="#b98550"/><path d="M126 52 122 40M126 46l-5-3M136 52l3-12M137 46l5-3" stroke="#6b5a45" stroke-width="2" stroke-linecap="round" fill="none"/><circle cx="133" cy="62" r="3.600" fill="#1a1210"/><ellipse cx="149" cy="68" rx="2" ry="1.500" fill="#4a2a22"/>';}
+  };
+  function figure(l){
+    if(!l)return '';
+    var sc=[0,.26,.55,1][l];
+    var eyes=l>=3?'<circle cx="-2" cy="-46" r="1.300" fill="#ff3a3a"/><circle cx="2" cy="-46" r="1.300" fill="#ff3a3a"/>':'';
+    var col=l===1?'#1d3a2c':'#0a0e0c';
+    return '<g transform="translate(176 134) scale('+sc+')" opacity="'+(l===1?.85:1)+'"><g fill="'+col+'" stroke="'+col+'"><path d="M-2 0-3.500-40H3.500L2 0z" stroke="none"/><ellipse cx="0" cy="-45" rx="4" ry="6.500" stroke="none"/><path d="M-3-50-9-64-13-62M-9-64-8-70M3-50 9-64 13-62M9-64 8-70" stroke-width="1.500" fill="none" stroke-linecap="round"/>'+'<path d="M-3-30-6-10M3-30 6-10" stroke-width="1.300" fill="none"/></g>'+eyes+'</g>';
+  }
+  function scene(k,fig,label){
+    var c=PAL[k],id='sg'+(uid++);
+    return '<svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice" role="img" aria-label="'+label+'"><defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+c[0]+'"/><stop offset="1" stop-color="'+c[1]+'"/></linearGradient></defs><rect width="200" height="150" fill="url(#'+id+')"/>'
+      +'<g fill="#2f5a45" opacity=".5"><use href="#pine" x="-6" y="48" width="28" height="86"/><use href="#pine" x="18" y="62" width="22" height="70"/><use href="#pine" x="146" y="50" width="26" height="84"/><use href="#pine" x="180" y="44" width="26" height="90"/></g>'
+      +'<ellipse cx="100" cy="148" rx="130" ry="24" fill="#3e7a52" opacity=".6"/>'
+      +figure(fig)+CR[k]()+'</svg>';
+  }
+  function tcard(p){
+    var nm=(p.tn!==undefined)?p.tn:p.n;
+    return '<div class="tcard"><div class="tin"><div class="th"><b>'+nm+'</b><span>HP '+p.hp+'</span></div><div class="art">'+scene(p.k,p.fig||0,p.n+' card art')+'</div><div class="tt">'+p.t+' &middot; '+(p.rar||'Rare Holo')+'</div><p>'+p.a+'</p><div class="tf"><span>MintVault Set 1</span><span>'+p.num+'/099</span></div></div></div>';
+  }
+  function card(p){
+    return '<article class="prod">'+tcard(p)+'<div class="pi"><span class="badge">'+(p.badge||'1st Edition Holo')+'</span><h3>'+p.title+'</h3><div class="rate"><span class="st">★★★★★</span> <small>'+p.rt+'</small></div><p class="desc">'+(p.d||'')+'</p><div class="price"><b>'+p.price+'</b>'+(p.was?'<s>'+p.was+'</s>':'')+(p.note?'<em>'+p.note+'</em>':'')+'</div><div class="stock">'+p.stock+'</div><button class="add" type="button">'+(p.btn||'Add to cart')+'</button></div></article>';
+  }
+
+  var P1=[
+    {k:'ember',n:'Embertail',t:'Fire',hp:70,num:'012',a:'Cinder Flick 20. Its tail glows warm when it is happy.',title:'Embertail - 1st Edition Holo, Graded 10',badge:'Graded 10',price:'$4.99',was:'$89.00',rt:'4.9 (1,284)',stock:'In stock',d:'Warm, bright and impossibly shiny.'},
+    {k:'moss',n:'Mossprig',t:'Leaf',hp:60,num:'014',a:'Sprout Shuffle 10. Grows a new leaf every sunrise.',title:'Mossprig - 1st Edition Holo, Graded 10',badge:'Graded 10',price:'$3.99',was:'$64.00',rt:'4.8 (902)',stock:'In stock',d:'Fresh green holo with a perfect centering.'},
+    {k:'zap',n:'Zapnibble',t:'Spark',hp:50,num:'021',a:'Static Nibble 20. Leaves tiny sparks on everything.',title:'Zapnibble - Rare Holo, Graded 10',badge:'Graded 10',price:'$5.49',was:'$120.00',rt:'5.0 (2,411)',stock:'Only 6 left',d:'Our most requested card this month.'},
+    {k:'tide',n:'Tidepuff',t:'Water',hp:80,num:'033',a:'Bubble Bounce 30. Puffs up when it is surprised.',title:'Tidepuff - 1st Edition Holo, Graded 10',badge:'Graded 10',price:'$2.99',was:'$45.00',rt:'4.7 (577)',stock:'In stock',d:'Cool blues, crisp corners.'},
+    {k:'frost',n:'Frostmoth',t:'Ice',hp:60,num:'038',a:'Snowdust 20. Its wings leave a trail of glitter.',title:'Frostmoth - Reverse Holo, Graded 10',badge:'Reverse Holo',price:'$4.49',was:'$76.00',rt:'4.9 (1,038)',stock:'In stock',d:'Delicate, sparkling, very giftable.'},
+    {k:'pebble',n:'Pebblor',t:'Stone',hp:90,num:'047',a:'Gentle Rumble 30. Surprisingly good at hugs.',title:'Pebblor - Rare, Graded 9',badge:'Graded 9',price:'$1.99',was:'$32.00',rt:'4.6 (311)',stock:'In stock',d:'A solid pick for any starter binder.'},
+    {k:'gloom',n:'Gloomcap',t:'Shade',hp:70,num:'052',a:'Spore Puff 20. Only glows when nobody is looking.',title:'Gloomcap - 1st Edition Holo, Graded 10',badge:'Graded 10',price:'$5.99',was:'$140.00',rt:'5.0 (3,120)',stock:'Only 3 left',d:'Deep purples. Collectors love this one.'},
+    {k:'sun',n:'Sunpetal',t:'Light',hp:50,num:'061',a:'Morning Bloom 10. Turns to face whoever is kindest.',title:'Sunpetal - Rare Holo, Graded 10',badge:'Graded 10',price:'$3.49',was:'$58.00',rt:'4.8 (744)',stock:'In stock',d:'Sunshine in a sleeve.'}
+  ];
+  var P2=[
+    {k:'fawn',n:'Hollowfawn',t:'Wild',hp:40,num:'066',a:'Soft Step 10. Never makes a sound on dry leaves.',title:'Hollowfawn - 1st Edition Holo, Graded 10',badge:'Graded 10',price:'$0.99',was:'$61.00',rt:'4.9 (88)',stock:'In stock',d:'A shy forest-dweller. Looks best in low light.',fig:1},
+    {k:'moss',n:'Mossprig',t:'Leaf',hp:60,num:'014',a:'Sprout Shuffle 10. Grows a new leaf every sunrise.',title:'Mossprig - Spare copy, Graded 10',badge:'Graded 10',price:'$0.09',was:'$64.00',note:'Price updated nightly',rt:'4.8 (902)',stock:'In stock (1)',d:'Soft, quiet and very easy to look after.'},
+    {k:'gloom',n:'Gloomcap',t:'Shade',hp:70,num:'052',a:'Spore Puff 20. Only glows when nobody is looking.',title:'Gloomcap - Display copy',badge:'Graded 10',price:'$0.00',note:'free if you stay',rt:'5.0 (3,120)',stock:'In stock',d:'Free. Really. Just stay a little longer.'},
+    {k:'ember',n:'Embertail',t:'Fire',hp:70,num:'012',a:'Cinder Flick 20. Its tail glows warm when it is happy.',title:'Embertail - Night edition',badge:'Graded 10',price:'$4.99',was:'$89.00',rt:'4.9 (1,284)',stock:'In stock',d:'Warm to the touch. It keeps the cold away, and the dark away, and the things that wait just past the edge of the light, and the'}
+  ];
+  var P3=[
+    {k:'moss',n:'Mossprig',tn:'Mosspr g',t:'Leaf',hp:60,num:'014',a:'Sprout Shuffle 10. It was here a moment ago.',title:'Mosspr g - 1st Edition Holo',badge:'Graded 10',price:'$0.00',was:'$64.00',rt:'4.8 (902)',stock:'LAST SEEN: forest edge',d:'It does not need watering. It needs you.',fig:2},
+    {k:'pebble',n:'Pebblor',tn:'',t:'Stone',hp:90,num:'047',a:'Gentle Rumble 30. It has not moved. Check again.',title:'the one in the trees',badge:'Not graded',price:'-',rt:'(0)',stock:'LAST SEEN: third tree from the road',d:'Description unavailable.',fig:2,rar:'Rare'},
+    {k:'tide',n:'Tidepuff',tn:'Tid pu f',t:'Water',hp:80,num:'033',a:'Bubble Bounce 30. Something is under the surface.',title:'Tid pu f - 1st Edition Holo',badge:'Graded 10',price:'$0.99',note:'per night',rt:'4.7 (577)',stock:'LAST SEEN: forest edge',d:'Smells like rain and pine needles.',fig:2},
+    {k:'fawn',n:'Hollowfawn',tn:'Hollow',t:'Wild',hp:40,num:'066',a:'Soft Step 10. It is not looking at the card. It is looking at you.',title:'Hollowfawn (it is watching)',badge:'Graded 10',price:'free',rt:'(you)',stock:'LAST SEEN: your window',d:'Please do not look directly at the background.',fig:2},
+    {k:'frost',n:'Frostmoth',tn:'Fr st m th',t:'Ice',hp:60,num:'038',a:'Snowdust 20. The glitter is not glitter.',title:'Fr st m th - Reverse Holo',badge:'Reverse Holo',price:'$0.99',was:'$76.00',rt:'4.9 (1,038)',stock:'LAST SEEN: forest edge',d:'Cold. Colder each night.',fig:2},
+    {k:'gloom',n:'Gloomcap',tn:'███████',t:'Shade',hp:99,num:'099',a:'Only glows when nobody is looking. Nobody is looking.',title:'███████ - Night 99 edition',badge:'Graded ?',price:'$0.00',note:'arrives Night 99',rt:'(?)',stock:'LAST SEEN: forest edge',d:'Estimated delivery: Night 99.',fig:2}
+  ];
+  var P4=[
+    {k:'fawn',n:'Hollowfawn',tn:'HOLLOW',t:'Wild',hp:99,num:'066',a:'Stand Still 99. Do not look at it.',title:'(it was never a fawn)',badge:'Unlisted',price:'$ ___',rt:'(it learned)',stock:'LAST SEEN: behind you',d:'it learned to stand like this.',fig:3,btn:'Stay'},
+    {k:'ember',n:'Embertail',tn:'Ember',t:'Fire',hp:12,num:'012',a:'Cinder Flick 20. The tail is almost out.',title:'burnt down',badge:'Unlisted',price:'0',rt:'(dim)',stock:'LAST SEEN: the fire',d:'the fire is smaller now.',fig:3,btn:'Stay'},
+    {k:'moss',n:'Mossprig',tn:'Mo  s',t:'Leaf',hp:99,num:'014',a:'Sprout Shuffle. It is closer than it was.',title:'it is closer',badge:'Unlisted',price:'$ 0 nights',rt:'(closer)',stock:'LAST SEEN: forest edge',d:'closer than the card says.',fig:3,btn:'Stay'},
+    {k:'frost',n:'Frostmoth',tn:'F',t:'Ice',hp:99,num:'038',a:'Snowdust. It was never snow.',title:'do not touch the glitter',badge:'Unlisted',price:'-',rt:'(cold)',stock:'LAST SEEN: your hands',d:'',fig:3,btn:'Stay'},
+    {k:'sun',n:'Sunpetal',tn:'Sunp',t:'Light',hp:1,num:'061',a:'Everything is facing the trees.',title:'turned away',badge:'Unlisted',price:'$ ?',rt:'(away)',stock:'LAST SEEN: facing away',d:'it no longer turns toward you.',fig:3,btn:'Stay'},
+    {k:'pebble',n:'Pebblor',tn:'99',t:'Stone',hp:99,num:'099',a:'Night 99. It has been walking all this time.',title:'Night 99',badge:'Unlisted',price:'tonight',rt:'(arriving)',stock:'ARRIVING: tonight',d:'shipping took 99 nights.',fig:3,btn:'Stay'}
+  ];
+  function fill(id,arr){var el=document.getElementById(id);if(el)el.innerHTML=arr.map(card).join('');}
+  fill('grid1',P1);fill('grid2',P2);fill('grid3',P3);fill('grid4',P4);
+  (function(){
+    var fan=document.getElementById('fan');
+    if(fan)fan.innerHTML=[['c1',P1[1]],['c2',P1[0]],['c3',P1[2]]].map(function(a){var d=document.createElement('div');d.innerHTML=tcard(a[1]);var t=d.firstChild;t.className+=' '+a[0];return t.outerHTML;}).join('');
+  })();
+
+  /* ---------- trees ---------- */
+  function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  function forest(seed,n,hmin,hmax){
+    var r=rng(seed),s='';
+    for(var i=0;i<n;i++){
+      var x=(i/n)*1000+(r()-.5)*(1000/n)*1.3, h=hmin+r()*(hmax-hmin), w=h*(.26+r()*.08), dead=r()<.18;
+      s+='<use href="#'+(dead?'dead':'pine')+'" x="'+(x-w/2).toFixed(1)+'" y="'+(300-h).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+h.toFixed(1)+'"/>';
+    }
+    return s;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.trees[data-seed]'),function(el){
+    el.innerHTML='<svg viewBox="0 0 1000 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">'+forest(+el.dataset.seed,+el.dataset.n,+el.dataset.min,+el.dataset.max)+'</svg>';
+  });
+
+  /* ---------- toast / cart ---------- */
+  var toastEl=document.getElementById('toast'),toastT=0,cartN=0,cartEl=document.getElementById('cartN');
+  function toast(msg){if(!msg)return;toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show');},2600);}
+  var ADD={1:['Added to cart.'],2:['Added to cart.','Added. You already added this.'],3:['It is in your cart. It is also in the trees.','Shipping takes 99 nights.','Your cart is getting heavier.'],4:["You can't take it with you.",'It saw you do that.','Stay.'],5:['']};
+  var BTN={1:'Added ✓',2:'Added (again)',3:'in your cart',4:'stay'};
+  var CHK={1:'This is a demo shop: nothing is bought and nothing is collected.',2:'Checkout is temporarily unavailable.',3:'Checkout is unavailable. Please stay.',4:'there is no checkout',5:''};
+  var addCount=0;
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.add');
+    if(b){
+      cartN++;addCount++;cartEl.textContent=cartN;
+      var m=ADD[curZone]||ADD[1];toast(m[(addCount-1)%m.length]);
+      var old=b.getAttribute('data-t')||b.textContent;b.setAttribute('data-t',old);
+      b.textContent=BTN[curZone]||BTN[1];
+      clearTimeout(b._t);b._t=setTimeout(function(){b.textContent=old;},1700);
+      return;
+    }
+    if(e.target.closest&&e.target.closest('#cart')){toast(CHK[curZone]);}
+  });
+  document.getElementById('back').addEventListener('click',function(e){
+    e.preventDefault();
+    window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});
+  });
+
+  /* ---------- countdown ---------- */
+  var cdLeft=2*3600+14*60+59,cdEl=document.getElementById('cd'),cdl=document.getElementById('cdl');
+  function pad(n){return n<10?'0'+n:''+n;}
+  function tickCd(){
+    if(cdLeft>0)cdLeft--;
+    if(curZone>=3){cdl.textContent='Sale ended';cdEl.textContent='98 nights ago';return;}
+    cdl.textContent='Sale ends in';
+    cdEl.textContent=pad(Math.floor(cdLeft/3600))+':'+pad(Math.floor(cdLeft%3600/60))+':'+pad(cdLeft%60);
+  }
+  setInterval(tickCd,1000);
+
+  /* ---------- reveals ---------- */
+  var rvs=document.querySelectorAll('.rv,.fd');
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.15});
+    Array.prototype.forEach.call(rvs,function(el){io.observe(el);});
+  }else{Array.prototype.forEach.call(rvs,function(el){el.classList.add('in');});}
+
+  /* ---------- scroll engine ---------- */
+  var zones=Array.prototype.slice.call(document.querySelectorAll('.zone'));
+  var z4=document.getElementById('z4'),z5=document.getElementById('z5');
+  var tops=[],hs=[];
+  function measure(){
+    var sy=window.pageYOffset||0;
+    zones.forEach(function(z,i){var r=z.getBoundingClientRect();tops[i]=r.top+sy;hs[i]=r.height;});
+  }
+  var curZone=1,lastNight=-1,ticking=false,mx=-1,my=-1,mouseSeen=false;
+  var nightEl=document.getElementById('night'),pair=document.getElementById('pair');
+  var navAlt=Array.prototype.slice.call(document.querySelectorAll('.site-head nav a'));
+  navAlt.forEach(function(a){a.setAttribute('data-orig',a.textContent);});
+  var TITLES={1:'MintVault Cards - Rare cards. Unreal prices.',2:'MintVault Cards - Rare cards. Unreal prices.',3:'MintVault Cards - stay a while',4:"don't turn around",5:'NIGHT 99'};
+
+  function setZone(z){
+    if(z===curZone)return;
+    body.classList.remove('zone-'+curZone);body.classList.add('zone-'+z);
+    curZone=z;document.title=TITLES[z];
+    navAlt.forEach(function(a){a.textContent=z>=3?a.getAttribute('data-alt'):a.getAttribute('data-orig');});
+    tickCd();
+  }
+  function update(){
+    ticking=false;
+    var y=window.pageYOffset||0,ih=window.innerHeight,max=Math.max(1,root.scrollHeight-ih);
+    var p=clamp(y/max,0,1);
+    root.style.setProperty('--p',p.toFixed(4));
+    var z=1,probe=y+ih*.45;
+    for(var i=0;i<tops.length;i++){if(tops[i]<=probe)z=i+1;}
+    setZone(z);
+    if(z4){var zp=clamp((y-tops[3])/Math.max(1,hs[3]-ih),0,1);z4.style.setProperty('--zp',zp.toFixed(4));}
+    var q=clamp((y-tops[4])/Math.max(1,hs[4]-ih),0,1);
+    root.style.setProperty('--q',q.toFixed(4));
+    body.classList.toggle('end',q>.95);
+    var n=1+Math.round(p*98);
+    if(n!==lastNight){lastNight=n;nightEl.textContent='NIGHT '+(n<10?'0'+n:n);}
+    /* eyes in the corner follow the cursor */
+    if(curZone===3||curZone===4){
+      var r=pair.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,tx=0,ty=0;
+      if(mouseSeen&&!reduce){
+        var dx=mx-cx,dy=my-cy,d=Math.sqrt(dx*dx+dy*dy)||1,s=Math.min(7,d/55);
+        tx=dx/d*s;ty=dy/d*s*.7;
+      }else if(!reduce){tx=Math.sin(p*60)*4;ty=Math.cos(p*45)*2;}
+      pair.style.transform='translate('+tx.toFixed(1)+'px,'+ty.toFixed(1)+'px)';
+    }
+    audioUpdate(p);
+  }
+  function req(){if(!ticking){ticking=true;requestAnimationFrame(update);}}
+  window.addEventListener('scroll',req,{passive:true});
+  window.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;mouseSeen=true;req();},{passive:true});
+  window.addEventListener('resize',function(){measure();req();});
+  window.addEventListener('load',function(){measure();req();});
+  if('ResizeObserver' in window){new ResizeObserver(function(){measure();req();}).observe(body);}
+
+  /* ---------- optional sound: only after click, generated, quiet ---------- */
+  var ac=null,master=null,wind=null,windG=null,drone=null,droneG=null,soundOn=false,sndBtn=document.getElementById('snd');
+  function audioInit(){
+    var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
+    ac=new AC();
+    var len=ac.sampleRate*4,buf=ac.createBuffer(1,len,ac.sampleRate),d=buf.getChannelData(0),last=0;
+    for(var i=0;i<len;i++){var w=Math.random()*2-1;last=(last+.02*w)/1.02;d[i]=last*3.5;}
+    var src=ac.createBufferSource();src.buffer=buf;src.loop=true;
+    wind=ac.createBiquadFilter();wind.type='lowpass';wind.frequency.value=500;
+    windG=ac.createGain();windG.gain.value=.15;
+    master=ac.createGain();master.gain.value=0;
+    src.connect(wind);wind.connect(windG);windG.connect(master);
+    droneG=ac.createGain();droneG.gain.value=.02;
+    var o1=ac.createOscillator(),o2=ac.createOscillator();
+    o1.type='sine';o1.frequency.value=48;o2.type='sine';o2.frequency.value=50.5;
+    o1.connect(droneG);o2.connect(droneG);droneG.connect(master);
+    master.connect(ac.destination);
+    src.start();o1.start();o2.start();
+    return true;
+  }
+  sndBtn.addEventListener('click',function(){
+    if(!ac&&!audioInit())return;
+    soundOn=!soundOn;
+    if(soundOn&&ac.resume)ac.resume();
+    master.gain.setTargetAtTime(soundOn?.3:0,ac.currentTime,.6);
+    sndBtn.textContent=soundOn?'sound: on':'sound: off';
+    sndBtn.setAttribute('aria-pressed',soundOn?'true':'false');
+    if(soundOn)audioUpdate(clamp((window.pageYOffset||0)/Math.max(1,root.scrollHeight-window.innerHeight),0,1));
+  });
+  function audioUpdate(p){
+    if(!ac||!soundOn)return;
+    var t=ac.currentTime;
+    wind.frequency.setTargetAtTime(520-p*320,t,.4);
+    windG.gain.setTargetAtTime(.12+p*.22,t,.4);
+    droneG.gain.setTargetAtTime(.02+p*p*.14,t,.4);
+  }
+
+  measure();update();
+})();
+</script>
+<noscript>This page needs JavaScript to draw its cards and to descend.</noscript>
+</body>
+</html>
