@@ -297,7 +297,7 @@ noscript{display:block;padding:40px;text-align:center}
 <div id="grain" aria-hidden="true"></div>
 <div id="night" aria-hidden="true">NIGHT 01</div>
 <div id="eyes" aria-hidden="true"><div class="dark"></div><div class="pair" id="pair"><i></i><i></i></div></div>
-<button id="snd" type="button" aria-pressed="false">sound: off</button>
+<button id="snd" type="button" aria-pressed="true">sound: on</button>
 <div id="toast" role="status" aria-live="polite"></div>
 
 <div class="annc" id="annc">Free worldwide shipping on every order &middot; Graded &amp; authenticated &middot; New drops daily</div>
@@ -688,7 +688,7 @@ noscript{display:block;padding:40px;text-align:center}
   window.addEventListener('load',function(){measure();req();});
   if('ResizeObserver' in window){new ResizeObserver(function(){measure();req();}).observe(body);}
 
-  /* ---------- optional sound: only after click, generated, quiet ---------- */
+  /* ---------- ambient sound: generated, quiet, on by default ---------- */
   var ac=null,master=null,wind=null,windG=null,drone=null,droneG=null,soundOn=false,sndBtn=document.getElementById('snd');
   function audioInit(){
     var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
@@ -708,14 +708,40 @@ noscript{display:block;padding:40px;text-align:center}
     src.start();o1.start();o2.start();
     return true;
   }
-  sndBtn.addEventListener('click',function(){
-    if(!ac&&!audioInit())return;
-    soundOn=!soundOn;
-    if(soundOn&&ac.resume)ac.resume();
-    master.gain.setTargetAtTime(soundOn?.3:0,ac.currentTime,.6);
-    sndBtn.textContent=soundOn?'sound: on':'sound: off';
+  /* Sound is on by default. Browsers block audio until the visitor clicks, taps or presses a key
+     (scrolling does not count), so the context starts suspended and unlocks on the first gesture. */
+  var unlocked=false,GESTURES=['pointerdown','keydown','touchend'];
+  function curP(){return clamp((window.pageYOffset||0)/Math.max(1,root.scrollHeight-window.innerHeight),0,1);}
+  function setLabel(){
+    sndBtn.textContent=!soundOn?'sound: off':(unlocked?'sound: on':'sound: on · tap anywhere');
     sndBtn.setAttribute('aria-pressed',soundOn?'true':'false');
-    if(soundOn)audioUpdate(clamp((window.pageYOffset||0)/Math.max(1,root.scrollHeight-window.innerHeight),0,1));
+  }
+  function applySound(){
+    if(!ac)return;
+    master.gain.setTargetAtTime(soundOn?.3:0,ac.currentTime,.6);
+    if(soundOn)audioUpdate(curP());
+    setLabel();
+  }
+  function unlock(){
+    if(unlocked)return;
+    if(!ac&&!audioInit())return;
+    var r=ac.resume&&ac.resume();
+    function done(){unlocked=(ac.state==='running');if(unlocked)GESTURES.forEach(function(g){window.removeEventListener(g,onGesture,true);});applySound();}
+    if(r&&r.then)r.then(done,done);else done();
+  }
+  function onGesture(e){if(e.target&&sndBtn.contains(e.target))return;if(soundOn)unlock();}
+  if(audioInit()){
+    unlocked=(ac.state==='running');
+    if(!unlocked)GESTURES.forEach(function(g){window.addEventListener(g,onGesture,true);});
+  }
+  soundOn=true;
+  applySound();setLabel();
+  sndBtn.addEventListener('click',function(){
+    if(!ac)return;
+    if(soundOn&&!unlocked){unlock();return;}
+    soundOn=!soundOn;
+    if(soundOn)unlock();
+    applySound();
   });
   function audioUpdate(p){
     if(!ac||!soundOn)return;
